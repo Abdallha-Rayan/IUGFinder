@@ -20,6 +20,7 @@ app.use(bodyParser.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
+
 app.get('/', (req, res) => {
     res.send('API is running. Visit /api-docs for Swagger documentation.');
   });
