@@ -16,6 +16,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
+
 // المسارات
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/auth', authRoutes);
