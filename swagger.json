@@ -23,7 +23,9 @@
   "paths": {
     "/api/auth/login": {
       "post": {
-        "tags": ["IUG Finder"],
+        "tags": [
+          "IUG Finder"
+        ],
         "summary": "User Login",
         "description": "Login for an existing user",
         "operationId": "loginUser",
@@ -33,7 +35,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
                     "type": "string",
@@ -82,7 +87,9 @@
     },
     "/api/auth/register": {
       "post": {
-        "tags": ["IUG Finder Cretae reports"],
+        "tags": [
+          "IUG Finder Cretae reports"
+        ],
         "summary": "User Register",
         "description": "Register for new user",
         "operationId": "registerUser",
@@ -93,8 +100,7 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "first_name",
-                  "last_name",
+                  "full_name",
                   "email",
                   "university_id",
                   "phone",
@@ -102,13 +108,9 @@
                   "confirmPassword"
                 ],
                 "properties": {
-                  "first_name": {
+                  "full_name": {
                     "type": "string",
-                    "example": "Abdallah"
-                  },
-                  "last_name": {
-                    "type": "string",
-                    "example": "rayan"
+                    "example": "rayan rayan"
                   },
                   "email": {
                     "type": "string",
@@ -150,13 +152,9 @@
                     "user": {
                       "type": "object",
                       "properties": {
-                        "first_name": {
+                        "full_name": {
                           "type": "string",
-                          "example": "Abdallah"
-                        },
-                        "last_name": {
-                          "type": "string",
-                          "example": "rayan"
+                          "example": "rayan rayan"
                         },
                         "email": {
                           "type": "string",
@@ -193,7 +191,9 @@
     },
     "/api/reports": {
       "post": {
-        "tags": ["IUG Finder Cretae reports"],
+        "tags": [
+          "IUG Finder Cretae reports"
+        ],
         "summary": "User Cretae reports",
         "description": "reports for new user",
         "operationId": "reports For User",
@@ -275,7 +275,9 @@
         }
       },
       "get": {
-        "tags": ["IUG Finder Cretae reports"],
+        "tags": [
+          "IUG Finder Cretae reports"
+        ],
         "summary": "get Reports For User",
         "description": "Get all reports based on user role",
         "operationId": "getReports",
@@ -300,16 +302,49 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": { "type": "integer", "example": 1 },
-                          "item_type": { "type": "string", "example": "مفتاح" },
-                          "color": { "type": "string", "example": "أسود" },
-                          "report_date": { "type": "string", "format": "date-time", "example": "2025-04-16T21:00:00.000Z" },
-                          "report_time": { "type": "string", "format": "time", "example": "11:30:00" },
-                          "location": { "type": "string", "example": "مبنى B - الطابق الثاني" },
-                          "description": { "type": "string", "example": "المفتاح ضاع قرب الكافتيريا" },
-                          "user_id": { "type": "integer", "example": 3 },
-                          "created_at": { "type": "string", "format": "date-time", "example": "2025-04-17T12:12:52.000Z" },
-                          "status": { "type": "string", "example": "مفقود" }
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "item_type": {
+                            "type": "string",
+                            "example": "مفتاح"
+                          },
+                          "color": {
+                            "type": "string",
+                            "example": "أسود"
+                          },
+                          "report_date": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2025-04-16T21:00:00.000Z"
+                          },
+                          "report_time": {
+                            "type": "string",
+                            "format": "time",
+                            "example": "11:30:00"
+                          },
+                          "location": {
+                            "type": "string",
+                            "example": "مبنى B - الطابق الثاني"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "المفتاح ضاع قرب الكافتيريا"
+                          },
+                          "user_id": {
+                            "type": "integer",
+                            "example": 3
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2025-04-17T12:12:52.000Z"
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "مفقود"
+                          }
                         }
                       }
                     }
@@ -323,10 +358,12 @@
           }
         }
       }
-    }
-    ,"/api/reports/others": {
+    },
+    "/api/reports/others": {
       "get": {
-        "tags": ["IUG Finder Cretae reports"],
+        "tags": [
+          "IUG Finder Cretae reports"
+        ],
         "summary": "Get Reports With Other Status",
         "description": "Get all reports where status is not 'مفقود' or 'موجود'",
         "operationId": "getOtherReports",
@@ -351,16 +388,43 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": { "type": "integer", "example": 5 },
-                          "item_type": { "type": "string", "example": "حقيبة" },
-                          "color": { "type": "string", "example": "أزرق" },
-                          "report_date": { "type": "string", "format": "date-time" },
-                          "report_time": { "type": "string", "format": "time" },
-                          "location": { "type": "string" },
-                          "description": { "type": "string" },
-                          "user_id": { "type": "integer" },
-                          "created_at": { "type": "string", "format": "date-time" },
-                          "status": { "type": "string", "example": "تحت المراجعة" }
+                          "id": {
+                            "type": "integer",
+                            "example": 5
+                          },
+                          "item_type": {
+                            "type": "string",
+                            "example": "حقيبة"
+                          },
+                          "color": {
+                            "type": "string",
+                            "example": "أزرق"
+                          },
+                          "report_date": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "report_time": {
+                            "type": "string",
+                            "format": "time"
+                          },
+                          "location": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "integer"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "تحت المراجعة"
+                          }
                         }
                       }
                     }
@@ -374,9 +438,12 @@
           }
         }
       }
-    },"/api/reports/lost": {
+    },
+    "/api/reports/lost": {
       "get": {
-        "tags": ["IUG Finder Cretae reports"],
+        "tags": [
+          "IUG Finder Cretae reports"
+        ],
         "summary": "Get Lost Reports",
         "description": "Get all reports where status is 'مفقود'",
         "operationId": "getLostReports",
@@ -401,16 +468,43 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": { "type": "integer", "example": 3 },
-                          "item_type": { "type": "string", "example": "الة حاسبة" },
-                          "color": { "type": "string", "example": "رمادي" },
-                          "report_date": { "type": "string", "format": "date-time" },
-                          "report_time": { "type": "string", "format": "time" },
-                          "location": { "type": "string" },
-                          "description": { "type": "string" },
-                          "user_id": { "type": "integer" },
-                          "created_at": { "type": "string", "format": "date-time" },
-                          "status": { "type": "string", "example": "مفقود" }
+                          "id": {
+                            "type": "integer",
+                            "example": 3
+                          },
+                          "item_type": {
+                            "type": "string",
+                            "example": "الة حاسبة"
+                          },
+                          "color": {
+                            "type": "string",
+                            "example": "رمادي"
+                          },
+                          "report_date": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "report_time": {
+                            "type": "string",
+                            "format": "time"
+                          },
+                          "location": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "integer"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "مفقود"
+                          }
                         }
                       }
                     }
@@ -424,9 +518,12 @@
           }
         }
       }
-    },"/api/reports/existing": {
+    },
+    "/api/reports/existing": {
       "get": {
-        "tags": ["IUG Finder Cretae reports"],
+        "tags": [
+          "IUG Finder Cretae reports"
+        ],
         "summary": "Get Existing Reports",
         "description": "Get all reports where status is 'موجود'",
         "operationId": "getExistingReports",
@@ -451,16 +548,43 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": { "type": "integer", "example": 4 },
-                          "item_type": { "type": "string", "example": "الة حاسبة" },
-                          "color": { "type": "string", "example": "رمادي" },
-                          "report_date": { "type": "string", "format": "date-time" },
-                          "report_time": { "type": "string", "format": "time" },
-                          "location": { "type": "string" },
-                          "description": { "type": "string" },
-                          "user_id": { "type": "integer" },
-                          "created_at": { "type": "string", "format": "date-time" },
-                          "status": { "type": "string", "example": "موجود" }
+                          "id": {
+                            "type": "integer",
+                            "example": 4
+                          },
+                          "item_type": {
+                            "type": "string",
+                            "example": "الة حاسبة"
+                          },
+                          "color": {
+                            "type": "string",
+                            "example": "رمادي"
+                          },
+                          "report_date": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "report_time": {
+                            "type": "string",
+                            "format": "time"
+                          },
+                          "location": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "integer"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "موجود"
+                          }
                         }
                       }
                     }
@@ -474,9 +598,12 @@
           }
         }
       }
-    },"/api/reports/{id}": {
+    },
+    "/api/reports/{id}": {
       "delete": {
-        "tags": ["IUG Finder Cretae reports"],
+        "tags": [
+          "IUG Finder Cretae reports"
+        ],
         "summary": "Delete a report",
         "description": "Allows an admin to delete any report, and a user to delete their own report only.",
         "operationId": "deleteReport",
@@ -521,9 +648,5 @@
         }
       }
     }
-    
-    
-    
-    
   }
 }

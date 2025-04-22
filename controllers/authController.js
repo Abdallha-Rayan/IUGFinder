@@ -30,7 +30,7 @@ const login = async (req, res) => {
       message: "Login successful",
       user: {
         id: user.id,
-        name: `${user.first_name} ${user.last_name}`,
+        name: user.full_name,
         role: user.role,
         email: user.email,
         token:token,
@@ -48,8 +48,7 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   const {
-    first_name,
-    last_name,
+    full_name,
     email,
     university_id,
     phone,
@@ -58,8 +57,7 @@ const register = async (req, res) => {
   } = req.body;
 
   if (
-    !first_name ||
-    !last_name ||
+    !full_name||
     !email ||
     !university_id ||
     !phone ||
@@ -98,8 +96,7 @@ const register = async (req, res) => {
     const insertNewUserSql = queryList.INSERT_NEW_USER_REGISTERED;
 
     await db.query(insertNewUserSql, [
-      first_name,
-      last_name,
+      full_name,
       email,
       university_id,
       phone,
