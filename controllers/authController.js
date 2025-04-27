@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { queryList } = require("../DB/queryes");
 const { hashPassword } = require("../utils/hash");
+const { query } = require("../config/db");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -33,9 +34,9 @@ const login = async (req, res) => {
         name: user.full_name,
         role: user.role,
         email: user.email,
-        token:token,
-        university_id:user.university_id,
-        phone:user.phone
+        token: token,
+        university_id: user.university_id,
+        phone: user.phone,
       },
     });
   } catch (error) {
@@ -47,17 +48,12 @@ const login = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  const {
-    full_name,
-    email,
-    university_id,
-    phone,
-    password,
-    confirmPassword,
-  } = req.body;
+  const { full_name, email, university_id, phone, password, confirmPassword } =
+    req.body;
+  const photo = req.file ? req.file.filename : null; // التأكد من رفع صورة
 
   if (
-    !full_name||
+    !full_name ||
     !email ||
     !university_id ||
     !phone ||
@@ -89,10 +85,8 @@ const register = async (req, res) => {
           .json({ message: "Phone number already in use 👈🏻" });
     }
 
-    // 4. تشفير كلمة المرور
     const hashedPassword = await hashPassword(password);
 
-    // 5. إدخال المستخدم
     const insertNewUserSql = queryList.INSERT_NEW_USER_REGISTERED;
 
     await db.query(insertNewUserSql, [
@@ -101,6 +95,7 @@ const register = async (req, res) => {
       university_id,
       phone,
       hashedPassword,
+      photo,
     ]);
 
     res.status(201).json({ message: "User registered successfully ✅" });
@@ -110,4 +105,42 @@ const register = async (req, res) => {
   }
 };
 
-module.exports = { login, register };
+// const getDataUserById = async (req, res) => {
+//   const ID_USER = req.params.id;
+//   try {
+//     const checkSql = queryList.FIND_USER_BY_ID;
+//     const [results] = await query(checkSql, [ID_USER]);
+//     if (results.length === 0) {
+//       return res.status(404).json({
+//         message: "User not found",
+//       });
+//     }
+//     res.status(200).json({user:results[0]})
+//   } catch (error) {
+//     console.error('❌ Database error:', error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+const getDataUserById = async (req, res) => {
+  const ID_USER = req.params.id;
+  try {
+    const checkSql = queryList.FIND_USER_BY_ID;
+    const [results] = await db.query(checkSql, [ID_USER]);
+    console.log('Query results:', results);  // تحقق من النتائج
+
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({ user: results[0] });
+  } catch (error) {
+    console.error('❌ Database error:', error.message);  // طباعة تفاصيل الخطأ
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+module.exports = { login, register,getDataUserById };
