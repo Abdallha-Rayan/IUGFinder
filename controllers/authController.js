@@ -110,7 +110,6 @@ const getDataUserById = async (req, res) => {
   try {
     const checkSql = queryList.FIND_USER_BY_ID;
     const [results] = await db.query(checkSql, [ID_USER]);
-    console.log('Query results:', results);  // تحقق من النتائج
 
 
     if (results.length === 0) {
