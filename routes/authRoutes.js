@@ -7,7 +7,7 @@ const { login, register ,getDataUserById,updateUser} = require('../controllers/a
 
 router
   .get('/user/:id', verifyToken,getDataUserById)
-  .put('/user/:id',verifyToken,updateUser);
+  .put('/user/:id',verifyToken,upload.single('photo'),updateUser);
 router
 .post('/login', login)
 .post('/register', upload.single('photo'), register); 

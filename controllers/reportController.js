@@ -130,63 +130,7 @@ const deleteReport = async (req, res) => {
       .json({ message: "Database error", error: error.message });
   }
 };
-// const editreport = async (req, res) => {
-//   const reportId = req.params.id;
-//   const user = req.user;
-//   const {
-//     status,
-//     item_type,
-//     color,
-//     report_date,
-//     report_time,
-//     location,
-//     description,
-//   } = req.body;
-//   const photo = req.file ? req.file.filename : null; // إذا كانت الصورة مرفقة مع الطلب
 
-//   if (!reportId)
-//     return res.status(404).json({ message: "Invalid Report ID ❌" });
-
-//   try {
-//     // البحث عن التقرير باستخدام الـ ID
-//     const findSql = queryList.FIND_REPORT_BY_ID;
-//     const [results] = await db.query(findSql, [reportId]);
-//     if (results.length === 0) {
-//       return res.status(404).json({ message: "Report not found" });
-//     }
-
-//     const report = results[0];
-
-//     // التأكد من أن المستخدم لديه حق التعديل على التقرير
-//     if (user.role === "user" && report.user_id !== user.id) {
-//       return res.status(403).json({
-//         message: "🚫 Access denied. You can only edit your own reports.",
-//       });
-//     }
-
-//     // تحديث التقرير بما في ذلك الصورة
-//     const updateReport = queryList.UPDATE_REPORT_BY_ID;
-//     await db.query(updateReport, [
-//       status,
-//       item_type,
-//       color,
-//       report_date,
-//       report_time,
-//       location,
-//       description,
-//       photo, // تحديث الصورة
-//       reportId, // معرف التقرير لتحديد السجل الذي سيتم تحديثه
-//     ]);
-
-//     res.status(200).json({
-//       message: "✅ Report updated successfully",
-//       Id_Report: reportId,
-//     });
-//   } catch (error) {
-//     console.error("Edit Report Error:", error);
-//     res.status(500).json({ message: "❌ Database error", error: error.message });
-//   }
-// };
 const editreport = async (req, res) => {
   const reportId = req.params.id;
   const user = req.user;

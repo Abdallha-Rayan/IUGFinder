@@ -118,64 +118,72 @@ const getDataUserById = async (req, res) => {
         message: "User not found",
       });
     }
+    const { password, ...userWithoutPassword } = results[0];
 
-    res.status(200).json({ user: results[0] });
+    res.status(200).json({ user: userWithoutPassword });
   } catch (error) {
     console.error('❌ Database error:', error.message);  // طباعة تفاصيل الخطأ
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 const updateUser = async (req, res) => {
-  const userId = req.params.id * 1; // الحصول على ID المستخدم من الرابط
-  const { full_name, email, phone, photo } = req.body || {}; // التأكد من وجود الحقول التي قد تم إرسالها
-
+  const userId = req.params.id ;
+  const { full_name, email, phone,password } = req.body || {}; // التأكد من وجود الحقول التي قد تم إرسالها
+  if(!userId){
+   return res.status(404).json({ message:"Invalid ID User ❌"})
+  }
   console.log('Request Body:', req.body); // تحقق من محتويات الجسم المرسل
   console.log('req.user.id', req.user.id, 'userId', userId);
 
-  // التأكد من أن التوكن المرتبط بالطلب هو نفس التوكن الخاص بالمستخدم الذي يريد التعديل
-  if (req.user.id !== userId) {
+  
+  
+  try {
+    const findUser = queryList.FIND_USER_BY_ID
+    const [results] = await db.query(findUser,[userId])
+      if(results.length === 0){
+        return res.status(404).json({message:'Invalid ID User ❌'})
+      }
+    const user = results[0]
+    // التأكد من أن التوكن المرتبط بالطلب هو نفس التوكن الخاص بالمستخدم الذي يريد التعديل
+  if (user.id !== userId * 1) {
     return res.status(403).json({ message: "You are not authorized to update this user" });
   }
-
-  // إذا لم يتم إرسال أي بيانات لتحديثها
-  if (!full_name && !email && !phone && !photo) {
-    return res.status(400).json({ message: "No fields to update" });
-  }
-
-  // بناء استعلام التحديث حسب الحقول المرسلة فقط
+    // بناء استعلام التحديث حسب الحقول المرسلة فقط
   const updateFields = [];
-  const values = [];
+  const updateValues = [];
 
   // التحقق من الحقول المرسلة وتحديد ما سيتم تحديثه
   if (full_name) {
     updateFields.push("full_name = ?");
-    values.push(full_name);
+    updateValues.push(full_name);
   }
   if (email) {
     updateFields.push("email = ?");
-    values.push(email);
+    updateValues.push(email);
   }
   if (phone) {
     updateFields.push("phone = ?");
-    values.push(phone);
+    updateValues.push(phone);
   }
-  if (photo) {
+  if (req.file) {
     updateFields.push("photo = ?");
-    values.push(photo);
+    updateValues.push(req.file.filename);
   }
-
-  // إضافة ID المستخدم كآخر قيمة في القائمة (لتحديد أي سجل سيتم تحديثه)
-  values.push(userId);
-
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    updateFields.push("password = ?");
+    updateValues.push(hashedPassword);
+  }
+  if (updateFields.length === 0) {
+    return res.status(400).json({ message: "No fields to update" });
+  }
+  updateValues.push(userId);
   // إنشاء الاستعلام
   const updateSql = `UPDATE users SET ${updateFields.join(", ")} WHERE id = ?`;
-
-  try {
-    // تنفيذ الاستعلام
-    await db.query(updateSql, values);
+    await db.query(updateSql, updateValues);
 
     // الرد على المستخدم بعد نجاح التحديث
-    res.status(200).json({ message: "User updated successfully ✅" });
+    res.status(200).json({ message: "User updated successfully ✅", userID :userId});
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ message: "Server error" });
