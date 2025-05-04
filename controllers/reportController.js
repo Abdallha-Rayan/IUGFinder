@@ -1,7 +1,9 @@
 const db = require("../config/db");
+const catchAsync = require("../utils/catchAsync");
 const { queryList } = require("../DB/queryes");
 
-const createReport = async (req, res) => {
+
+const createReport = catchAsync( async (req, res) => {
   const {
     status,
     item_type,
@@ -18,28 +20,28 @@ const createReport = async (req, res) => {
   if (!status || !item_type || !report_date || !report_time || !location) {
     return res.status(400).json({ message: "Missing required fields" });
   }
-  try {
-    const sql = queryList.CREATE_NEW_REPORT;
-    const [results] = await db.query(sql, [
-      status,
-      item_type,
-      color,
-      report_date,
-      report_time,
-      location,
-      description,
-      user_id,
-      photo
+  const sql = queryList.CREATE_NEW_REPORT;
+  const [results] = await db.query(sql, [
+    status,
+    item_type,
+    color,
+    report_date,
+    report_time,
+    location,
+    description,
+    user_id,
+    photo
 
-    ]);
-    res.status(201).json({
-      message: "Report created successfully",
-      reportId: results.insertId,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Database error", error: error });
-  }
-};
+  ]);
+  res.status(201).json({
+    message: "Report created successfully",
+    reportId: results.insertId,
+  });
+  // try {
+  // } catch (error) {
+  //   return res.status(500).json({ message: "Database error", error: error });
+  // }
+});
 
 const getReports = async (req, res) => {
   try {
