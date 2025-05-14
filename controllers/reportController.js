@@ -44,7 +44,6 @@ const createReport = catchAsync( async (req, res) => {
   //   return res.status(500).json({ message: "Database error", error: error });
   // }
 });
-
 const getReports = catchAsync( async (req, res) => {
   const userId = req.user.id;
   const userRole = req.user.role;
@@ -57,7 +56,7 @@ const getReports = catchAsync( async (req, res) => {
     FROM reports
     JOIN users ON reports.user_id = users.id`;
   } else {
-    sql = queryList.GET_ALL_REPORTS; // لازم يكون فيه شرط WHERE user_id = ?
+    sql = `${queryList.GET_ALL_REPORTS} ORDER BY created_at DESC`; // لازم يكون فيه شرط WHERE user_id = ?
     values = [userId];
   }
 
@@ -73,7 +72,6 @@ const getReports = catchAsync( async (req, res) => {
   //   return res.status(500).json({ message: "Database error", error: error });
   // }
 });
-
 const getOtherUsersReports = catchAsync( async (req, res) => {
   const userId = req.user.id;
   const sql = queryList.GET_OTHER_USERS_REPORTS;
@@ -132,7 +130,6 @@ const deleteReport = catchAsync( async (req, res,next) => {
   //     .json({ message: "Database error", error: error.message });
   // }
 });
-
 const editreport = catchAsync( async (req, res,next) => {
   const reportId = req.params.id;
   const user = req.user;
@@ -227,6 +224,57 @@ const editreport = catchAsync( async (req, res,next) => {
   // }
 });
 
+const getMatchingReports = catchAsync( async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'غير مسموح: صلاحيات غير كافية' });
+  }
+
+  // 2. جلب البلاغات المتطابقة
+  const [lostReports] = await db.query(`
+    SELECT * FROM reports 
+    WHERE status = 'مفقود'
+  `);
+
+  const matchedPairs = [];
+
+  // 3. البحث عن البلاغات المطابقة
+  for (const lostReport of lostReports) {
+    const [foundReports] = await db.query(`
+      SELECT * FROM reports 
+      WHERE 
+        item_type = ? 
+        AND color = ? 
+        AND status = 'موجود'
+      LIMIT 1
+    `, [lostReport.item_type, lostReport.color]);
+
+    if (foundReports.length > 0) {
+      matchedPairs.push({
+        lost: lostReport,
+        found: foundReports[0]
+      });
+    }
+  }
+
+  // 4. إرسال النتيجة
+  res.status(200).json({
+    success: true,
+    data: matchedPairs
+  });
+    // try {
+
+    // } catch (error) {
+    //   console.error('Error in getMatchingReports:', error);
+    //   res.status(500).json({
+    //     success: false,
+    //     message: 'فشل جلب البلاغات المتطابقة'
+    //   });
+    // }
+  });
+
+
+
+
 
 module.exports = {
   createReport,
@@ -236,4 +284,10 @@ module.exports = {
   getExistingReportsOnly,
   deleteReport,
   editreport,
+  getMatchingReports
 };
+
+
+
+
+

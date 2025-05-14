@@ -7,53 +7,11 @@ const { query } = require("../config/db");
 const catchAsync = require("../utils/catchAsync");
 
 
-// const login = async (req, res) => {
-//   const { email, password } = req.body;
-
-//   if (!email || !password)
-//     return res.status(400).json({ message: "Email and password are required" });
-//   const sql = queryList.LOGIN;
-
-//   try {
-//     const [results] = await db.query(sql, [email]);
-//     if (results.length === 0)
-//       return res.status(401).json({ message: "Invalid email or password" });
-
-//     const user = results[0];
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch)
-//       return res.status(401).json({ message: "Invalid email or password" });
-
-//     const token = jwt.sign(
-//       { id: user.id, email: user.email, role: user.role },
-//       process.env.JWT_SECRET,
-//       { expiresIn: process.env.JWT_EXPIRES_IN }
-//     );
-//     res.status(200).json({
-//       message: "Login successful",
-//       user: {
-//         id: user.id,
-//         name: user.full_name,
-//         role: user.role,
-//         email: user.email,
-//         token: token,
-//         university_id: user.university_id,
-//         phone: user.phone,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Error during login:", error);
-//     return res
-//       .status(500)
-//       .json({ message: "Server error", error: error.message });
-//   }
-// };
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password)
     return res.status(400).json({ message: "Email and password are required" });
-
   const sql = queryList.LOGIN;
 
   const [results] = await db.query(sql, [email]);
@@ -70,21 +28,6 @@ const login = catchAsync(async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN }
   );
-
-  // 1. إضافة إشعار إلى قاعدة البيانات
-  const notificationMessage = 'Welcome back!';
-  const notificationSql = 'INSERT INTO notifications (user_id, message) VALUES (?, ?)';
-  
-  await db.query(notificationSql, [user.id, notificationMessage]);
-
-  // 2. إرسال إشعار باستخدام Socket.IO
-  const userSocketId = req.userSockets[user.id];  // الحصول على socket.id للمستخدم
-  if (userSocketId) {
-    req.io.to(userSocketId).emit('loginNotification', {
-      message: notificationMessage,  // الرسالة التي ستظهر للمستخدم
-    });
-  }
-
   res.status(200).json({
     message: "Login successful",
     user: {
@@ -105,8 +48,17 @@ const login = catchAsync(async (req, res) => {
   //     .json({ message: "Server error", error: error.message });
   // }
 });
+const saveDeviceToken = catchAsync(async (req, res) => {
+  const {userId, deviceToken} = req.body ;
+  console.log(userId,deviceToken);
+  if(!userId ||!deviceToken){
+    return res.status(400).json({message:'Email and password are required'})
+  }
+  const sql = queryList.INSERT_DEVICE_TOKEN
+  await db.query(sql,[userId,deviceToken])
+  res.status(200).json({message:'successfully ✅'})
 
-
+});
 const register = catchAsync(async (req, res) => {
   const { full_name, email, university_id, phone, password, confirmPassword } =
     req.body;
@@ -252,4 +204,6 @@ const updateSql = `UPDATE users SET ${updateFields.join(", ")} WHERE id = ?`;
 
 
 
-module.exports = { login, register,getDataUserById ,updateUser };
+
+
+module.exports = { login, register,getDataUserById ,updateUser,saveDeviceToken };

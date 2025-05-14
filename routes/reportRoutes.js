@@ -2,15 +2,15 @@ const express = require("express");
 const router = express.Router();
 const upload = require('../utils/uploadImage');
 
+
 const {
   createReport,
   getReports,
   getOtherUsersReports,
-  getLostReportsOnly,getExistingReportsOnly,deleteReport,editreport
+  getLostReportsOnly,getExistingReportsOnly,deleteReport,editreport,getMatchingReports
 } = require("../controllers/reportController");
 const verifyToken = require("../middleware/authMiddleware");
 
-// 🔐 هذا المسار محمي بالتوكن
 router
   .delete("/:id", verifyToken, deleteReport)
   .put("/:id", verifyToken, upload.single('photo'),editreport);
@@ -20,5 +20,7 @@ router
   .get("/other", verifyToken, getOtherUsersReports)
   .get("/lost", verifyToken, getLostReportsOnly)
   .get("/existing", verifyToken, getExistingReportsOnly);
+
+router.get('/matched-reports', verifyToken, getMatchingReports);
 
 module.exports = router;
