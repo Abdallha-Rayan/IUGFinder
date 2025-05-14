@@ -41,8 +41,9 @@ exports.queryList = {
   `,
   FIND_USER_BY_ID: 'SELECT * FROM users WHERE id = ?',
   INSERT_DEVICE_TOKEN:`INSERT INTO user_device_tokens (user_id, device_token) 
-  VALUES (?, ?);
-  `
+  VALUES (?, ?);`,
+  SELECT_REPORTS_STATUS_LOST:` SELECT * FROM reports  WHERE status = 'مفقود'`,
+  SELECT_REPORTS_STATUS_LOST_FOUND:`SELECT * FROM reports WHERE item_type = ? AND color = ? AND status = 'موجود' LIMIT 1`
     
 
   

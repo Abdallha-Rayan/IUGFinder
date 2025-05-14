@@ -4,8 +4,7 @@ const appError = require("../utils/appError");
 const { queryList } = require("../DB/queryes");
 const AppError = require("../utils/appError");
 
-
-const createReport = catchAsync( async (req, res) => {
+const createReport = catchAsync(async (req, res) => {
   const {
     status,
     item_type,
@@ -15,7 +14,7 @@ const createReport = catchAsync( async (req, res) => {
     location,
     description,
   } = req.body;
-  const photo = req.file ? req.file.filename : null
+  const photo = req.file ? req.file.filename : null;
 
   const user_id = req.user.id;
 
@@ -32,8 +31,7 @@ const createReport = catchAsync( async (req, res) => {
     location,
     description,
     user_id,
-    photo
-
+    photo,
   ]);
   res.status(201).json({
     message: "Report created successfully",
@@ -44,7 +42,7 @@ const createReport = catchAsync( async (req, res) => {
   //   return res.status(500).json({ message: "Database error", error: error });
   // }
 });
-const getReports = catchAsync( async (req, res) => {
+const getReports = catchAsync(async (req, res) => {
   const userId = req.user.id;
   const userRole = req.user.role;
 
@@ -72,7 +70,7 @@ const getReports = catchAsync( async (req, res) => {
   //   return res.status(500).json({ message: "Database error", error: error });
   // }
 });
-const getOtherUsersReports = catchAsync( async (req, res) => {
+const getOtherUsersReports = catchAsync(async (req, res) => {
   const userId = req.user.id;
   const sql = queryList.GET_OTHER_USERS_REPORTS;
   const [results] = await db.query(sql, [userId]);
@@ -82,7 +80,7 @@ const getOtherUsersReports = catchAsync( async (req, res) => {
   //   return res.status(500).json({ message: "Database error", error: error });
   // }
 });
-const getLostReportsOnly = catchAsync( async (req, res) => {
+const getLostReportsOnly = catchAsync(async (req, res) => {
   const sql = queryList.GET_LOST_REPORTS_ONLY;
   const [results] = await db.query(sql);
   res.status(200).json({ reports: results });
@@ -91,7 +89,7 @@ const getLostReportsOnly = catchAsync( async (req, res) => {
   //   return res.status(500).json({ message: "Database error", error: error });
   // }
 });
-const getExistingReportsOnly = catchAsync( async (req, res) => {
+const getExistingReportsOnly = catchAsync(async (req, res) => {
   try {
     const sql = queryList.GET_EXISTING_REPORTS_ONLY;
     const [results] = await db.query(sql);
@@ -100,7 +98,7 @@ const getExistingReportsOnly = catchAsync( async (req, res) => {
     return res.status(500).json({ message: "Database error", error: error });
   }
 });
-const deleteReport = catchAsync( async (req, res,next) => {
+const deleteReport = catchAsync(async (req, res, next) => {
   const reportId = req.params.id;
   const user = req.user;
 
@@ -108,17 +106,17 @@ const deleteReport = catchAsync( async (req, res,next) => {
   const [results] = await db.query(findSql, [reportId]);
 
   if (results.length === 0) {
-    return next( new AppError ("Report not found",404 ))
+    return next(new AppError("Report not found", 404));
   }
 
   const report = results[0];
 
-  // المستخدم العادي لا يمكنه حذف بلاغ ليس له
   if (user.role === "user" && report.user_id !== user.id) {
-    return next( new AppError ("Access denied. You can only delete your own reports.",403 )) 
+    return next(
+      new AppError("Access denied. You can only delete your own reports.", 403)
+    );
   }
 
-  // الآن نحذف البلاغ
   const deleteSql = queryList.DELETE_REPORT;
   await db.query(deleteSql, [reportId]);
 
@@ -130,7 +128,7 @@ const deleteReport = catchAsync( async (req, res,next) => {
   //     .json({ message: "Database error", error: error.message });
   // }
 });
-const editreport = catchAsync( async (req, res,next) => {
+const editreport = catchAsync(async (req, res, next) => {
   const reportId = req.params.id;
   const user = req.user;
   const {
@@ -144,7 +142,7 @@ const editreport = catchAsync( async (req, res,next) => {
   } = req.body;
 
   if (!reportId) {
-    return next(new AppError("Invalid ID Report ❌",404))
+    return next(new AppError("Invalid ID Report ❌", 404));
   }
 
   const findSql = queryList.FIND_REPORT_BY_ID;
@@ -157,8 +155,9 @@ const editreport = catchAsync( async (req, res,next) => {
 
   // التحقق من أن المستخدم يمكنه تعديل هذا التقرير
   if (user.role === "user" && report.user_id !== user.id) {
-    return next(new AppError("🚫 Access denied. You can only edit your own reports.",403))
-   
+    return next(
+      new AppError("🚫 Access denied. You can only edit your own reports.", 403)
+    );
   }
 
   // إعداد الحقول التي سيتم تعديلها
@@ -198,17 +197,19 @@ const editreport = catchAsync( async (req, res,next) => {
   // التحقق من الصورة الجديدة
   if (req.file) {
     updatedFields.push("photo = ?");
-    updateValues.push(req.file.filename);  // تعيين اسم الصورة الجديدة
+    updateValues.push(req.file.filename); // تعيين اسم الصورة الجديدة
   }
 
   // إذا لم يتم إرسال أي حقل للتحديث
   if (updatedFields.length === 0) {
-    return next(new AppError("No fields to update",400))
+    return next(new AppError("No fields to update", 400));
   }
 
   // إضافة شرط الـ WHERE في النهاية
-  const updateSql = `UPDATE reports SET ${updatedFields.join(", ")} WHERE id = ?`;
-  updateValues.push(reportId);  // إضافة الـ reportId كقيمة للـ WHERE
+  const updateSql = `UPDATE reports SET ${updatedFields.join(
+    ", "
+  )} WHERE id = ?`;
+  updateValues.push(reportId); // إضافة الـ reportId كقيمة للـ WHERE
 
   // تنفيذ الاستعلام
   await db.query(updateSql, updateValues);
@@ -224,57 +225,40 @@ const editreport = catchAsync( async (req, res,next) => {
   // }
 });
 
-const getMatchingReports = catchAsync( async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'غير مسموح: صلاحيات غير كافية' });
+const getMatchingReports = catchAsync(async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "غير مسموح: صلاحيات غير كافية" });
   }
-
-  // 2. جلب البلاغات المتطابقة
-  const [lostReports] = await db.query(`
-    SELECT * FROM reports 
-    WHERE status = 'مفقود'
-  `);
+  const [lostReports] = await db.query(queryList.SELECT_REPORTS_STATUS_LOST);
 
   const matchedPairs = [];
 
-  // 3. البحث عن البلاغات المطابقة
   for (const lostReport of lostReports) {
-    const [foundReports] = await db.query(`
-      SELECT * FROM reports 
-      WHERE 
-        item_type = ? 
-        AND color = ? 
-        AND status = 'موجود'
-      LIMIT 1
-    `, [lostReport.item_type, lostReport.color]);
-
+    const [foundReports] = await db.query(
+      queryList.SELECT_REPORTS_STATUS_LOST_FOUND,
+      [lostReport.item_type, lostReport.color]
+    );
     if (foundReports.length > 0) {
       matchedPairs.push({
         lost: lostReport,
-        found: foundReports[0]
+        found: foundReports[0],
       });
     }
   }
-
-  // 4. إرسال النتيجة
   res.status(200).json({
     success: true,
-    data: matchedPairs
+    data: matchedPairs,
   });
-    // try {
+  // try {
 
-    // } catch (error) {
-    //   console.error('Error in getMatchingReports:', error);
-    //   res.status(500).json({
-    //     success: false,
-    //     message: 'فشل جلب البلاغات المتطابقة'
-    //   });
-    // }
-  });
-
-
-
-
+  // } catch (error) {
+  //   console.error('Error in getMatchingReports:', error);
+  //   res.status(500).json({
+  //     success: false,
+  //     message: 'فشل جلب البلاغات المتطابقة'
+  //   });
+  // }
+});
 
 module.exports = {
   createReport,
@@ -284,10 +268,5 @@ module.exports = {
   getExistingReportsOnly,
   deleteReport,
   editreport,
-  getMatchingReports
+  getMatchingReports,
 };
-
-
-
-
-

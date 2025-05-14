@@ -121,8 +121,9 @@ const getDataUserById =catchAsync( async (req, res) => {
   const ID_USER = req.params.id;
   const checkSql = queryList.FIND_USER_BY_ID;
   const [results] = await db.query(checkSql, [ID_USER]);
-
-
+  if(parseInt(ID_USER)!== req.user.id){
+    return res.status(400).json({message:'Access denied. You can only view your own data.'})
+  }
   if (results.length === 0) {
     return res.status(404).json({
       message: "User not found",
