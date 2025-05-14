@@ -1,7 +1,7 @@
 
 const express = require('express');
 const upload = require('../utils/uploadImage');
-const verifyToken = require("../middleware/authMiddleware");
+const {verifyToken} = require("../middleware/authMiddleware");
 const router = express.Router();
 const { login, register ,getDataUserById,updateUser,saveDeviceToken} = require('../controllers/authController');
 

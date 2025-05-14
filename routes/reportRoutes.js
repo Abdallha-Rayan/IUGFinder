@@ -9,7 +9,7 @@ const {
   getOtherUsersReports,
   getLostReportsOnly,getExistingReportsOnly,deleteReport,editreport,getMatchingReports
 } = require("../controllers/reportController");
-const verifyToken = require("../middleware/authMiddleware");
+const {verifyToken,checkAdmin} = require("../middleware/authMiddleware");
 
 router
   .delete("/:id", verifyToken, deleteReport)
@@ -21,6 +21,6 @@ router
   .get("/lost", verifyToken, getLostReportsOnly)
   .get("/existing", verifyToken, getExistingReportsOnly);
 
-router.get('/matched-reports', verifyToken, getMatchingReports);
+router.get('/matched-reports', verifyToken,checkAdmin, getMatchingReports);
 
 module.exports = router;
