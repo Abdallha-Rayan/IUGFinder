@@ -22,7 +22,7 @@ router
   .get("/existing", verifyToken, getExistingReportsOnly);
 
 router.get('/matched-reports', verifyToken,checkAdmin, getMatchingReports);
-router.post("/:id", verifyToken, updateReportStatus);;
+router.post("/:id/found", verifyToken, updateReportStatus);;
 
 
 module.exports = router;
