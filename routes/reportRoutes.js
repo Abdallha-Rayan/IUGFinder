@@ -7,13 +7,13 @@ const {
   createReport,
   getReports,
   getOtherUsersReports,
-  getLostReportsOnly,getExistingReportsOnly,deleteReport,editreport,getMatchingReports
+  getLostReportsOnly,getExistingReportsOnly,deleteReport,editreport,getMatchingReports,updateReportStatus
 } = require("../controllers/reportController");
 const {verifyToken,checkAdmin} = require("../middleware/authMiddleware");
 
 router
   .delete("/:id", verifyToken, deleteReport)
-  .put("/:id", verifyToken, upload.single('photo'),editreport);
+  .put("/:id", verifyToken, upload.single('photo'),editreport)
 router
   .post("/", verifyToken, upload.single('photo'),createReport)
   .get("/", verifyToken, getReports)
@@ -22,5 +22,7 @@ router
   .get("/existing", verifyToken, getExistingReportsOnly);
 
 router.get('/matched-reports', verifyToken,checkAdmin, getMatchingReports);
+router.post("/:id", verifyToken, updateReportStatus);;
+
 
 module.exports = router;

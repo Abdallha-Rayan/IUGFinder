@@ -1,7 +1,11 @@
 const admin = require("../config/firebase");
 
-// إرسال إشعار إلى جهاز واحد
 const sendNotification = async (deviceToken, title, body) => {
+  if (!deviceToken) {
+    console.error("❌ Device token is missing");
+    return { success: false, error: "Device token is required" };
+  }
+
   const message = {
     notification: {
       title: title,

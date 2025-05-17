@@ -60,7 +60,7 @@ const saveDeviceToken = catchAsync(async (req, res) => {
 
 });
 const register = catchAsync(async (req, res) => {
-  const { full_name, email, university_id, phone, password, confirmPassword } =
+  const { full_name, email, university_id, phone,devices_token, password, confirmPassword } =
     req.body;
   const photo = req.file ? req.file.filename : null; // التأكد من رفع صورة
 
@@ -105,6 +105,7 @@ const register = catchAsync(async (req, res) => {
     email,
     university_id,
     phone,
+    devices_token,
     hashedPassword,
     photo,
   ]);
@@ -138,69 +139,72 @@ const getDataUserById =catchAsync( async (req, res) => {
   //   res.status(500).json({ message: 'Server error', error: error.message });
   // }
 });
-const updateUser = catchAsync( async (req, res) => {
-  const userId = req.params.id ;
-  const { full_name, email, phone,password } = req.body || {}; // التأكد من وجود الحقول التي قد تم إرسالها
-  if(!userId){
-   return res.status(404).json({ message:"Invalid ID User ❌"})
+const updateUser = catchAsync(async (req, res) => {
+  const userId = req.params.id;
+  const { full_name, email, phone, password, devices_token } = req.body || {}; // التأكد من وجود الحقول المرسلة
+
+  if (!userId) {
+    return res.status(404).json({ message: "Invalid ID User ❌" });
   }
   console.log('Request Body:', req.body); // تحقق من محتويات الجسم المرسل
   console.log('req.user.id', req.user.id, 'userId', userId);
 
-  
-  
-  const findUser = queryList.FIND_USER_BY_ID
-  const [results] = await db.query(findUser,[userId])
-    if(results.length === 0){
-      return res.status(404).json({message:'Invalid ID User ❌'})
-    }
-  const user = results[0]
-  // التأكد من أن التوكن المرتبط بالطلب هو نفس التوكن الخاص بالمستخدم الذي يريد التعديل
-if (user.id !== userId * 1) {
-  return res.status(403).json({ message: "You are not authorized to update this user" });
-}
-  // بناء استعلام التحديث حسب الحقول المرسلة فقط
-const updateFields = [];
-const updateValues = [];
+  const findUser = queryList.FIND_USER_BY_ID;
+  const [results] = await db.query(findUser, [userId]);
+  if (results.length === 0) {
+    return res.status(404).json({ message: 'Invalid ID User ❌' });
+  }
 
-// التحقق من الحقول المرسلة وتحديد ما سيتم تحديثه
-if (full_name) {
-  updateFields.push("full_name = ?");
-  updateValues.push(full_name);
-}
-if (email) {
-  updateFields.push("email = ?");
-  updateValues.push(email);
-}
-if (phone) {
-  updateFields.push("phone = ?");
-  updateValues.push(phone);
-}
-if (req.file) {
-  updateFields.push("photo = ?");
-  updateValues.push(req.file.filename);
-}
-if (password) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  updateFields.push("password = ?");
-  updateValues.push(hashedPassword);
-}
-if (updateFields.length === 0) {
-  return res.status(400).json({ message: "No fields to update" });
-}
-updateValues.push(userId);
-// إنشاء الاستعلام
-const updateSql = `UPDATE users SET ${updateFields.join(", ")} WHERE id = ?`;
+  const user = results[0];
+  // التحقق من أن المستخدم يملك الصلاحية لتحديث نفسه
+  if (user.id !== userId * 1) {
+    return res.status(403).json({ message: "You are not authorized to update this user" });
+  }
+
+  // بناء استعلام التحديث حسب الحقول المرسلة فقط
+  const updateFields = [];
+  const updateValues = [];
+
+  // التحقق من الحقول المرسلة وتحديد ما سيتم تحديثه
+  if (full_name) {
+    updateFields.push("full_name = ?");
+    updateValues.push(full_name);
+  }
+  if (email) {
+    updateFields.push("email = ?");
+    updateValues.push(email);
+  }
+  if (phone) {
+    updateFields.push("phone = ?");
+    updateValues.push(phone);
+  }
+  if (req.file) {
+    updateFields.push("photo = ?");
+    updateValues.push(req.file.filename);
+  }
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    updateFields.push("password = ?");
+    updateValues.push(hashedPassword);
+  }
+  if (devices_token) {
+    updateFields.push("devices_token = ?");
+    updateValues.push(devices_token);
+  }
+
+  if (updateFields.length === 0) {
+    return res.status(400).json({ message: "No fields to update" });
+  }
+
+  updateValues.push(userId);
+  // إنشاء استعلام التحديث
+  const updateSql = `UPDATE users SET ${updateFields.join(", ")} WHERE id = ?`;
   await db.query(updateSql, updateValues);
 
   // الرد على المستخدم بعد نجاح التحديث
-  res.status(200).json({ message: "User updated successfully ✅", userID :userId});
-  // try {
-  // } catch (error) {
-  //   console.error("Error updating user:", error);
-  //   res.status(500).json({ message: "Server error" });
-  // }
+  res.status(200).json({ message: "User updated successfully ✅", userID: userId });
 });
+
 
 
 

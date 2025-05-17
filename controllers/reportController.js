@@ -3,6 +3,8 @@ const catchAsync = require("../utils/catchAsync");
 const appError = require("../utils/appError");
 const { queryList } = require("../DB/queryes");
 const AppError = require("../utils/appError");
+const { sendNotification } = require("../services/notificationService");
+
 
 const createReport = catchAsync(async (req, res) => {
   const {
@@ -260,6 +262,74 @@ const getMatchingReports = catchAsync(async (req, res) => {
   // }
 });
 
+
+
+// const updateReportStatus = catchAsync( async  (req, res)=> {
+//   const reportId = req.params.id;
+//   const {full_name, phone } = req.body;
+
+//   // تحديث حالة البلاغ في قاعدة البيانات
+//   await db.query("UPDATE reports SET status = 'موجود' WHERE id = ?", [reportId]);
+
+//   // جلب بيانات صاحب البلاغ من قاعدة البيانات
+//   const [report] = await db.query("SELECT user_id FROM reports WHERE id = ?", [reportId]);
+//   if (report.length === 0) {
+//     return res.status(404).json({ message: "Report not found" });
+//   }
+
+//   const ownerId = report[0].user_id;
+//   const [owner] = await db.query("SELECT devices_token FROM users WHERE id = ?", [ownerId]);
+
+//   if (owner.length > 0) {
+//     const notificationMessage = `Your lost item has been found! Contact: ${full_name} (Phone: ${phone}).`;
+//     await sendNotification(owner[0].devices_token, "Lost Item Found", notificationMessage);
+//   }
+
+//   res.status(200).json({ message: "Report status updated and owner notified successfully" });
+//   // try {
+//   // } catch (error) {
+//   //   console.error("Error updating report:", error);
+//   //   res.status(500).json({ message: "Error updating report" });
+//   // }
+// })
+
+
+const updateReportStatus = catchAsync(async (req, res) => {
+  const reportId = req.params.id;
+  const { full_name, phone } = req.body;
+  console.log('reportId',reportId,'Full Name' , full_name,'phone',phone);
+
+  if (!full_name || !phone) {
+    return res.status(400).json({ message: "Full name and phone are required" });
+  }
+
+  // تحديث حالة البلاغ في قاعدة البيانات
+  await db.query("UPDATE reports SET status = 'موجود' WHERE id = ?", [reportId]);
+
+  // جلب بيانات صاحب البلاغ من قاعدة البيانات
+  const [report] = await db.query("SELECT user_id FROM reports WHERE id = ?", [reportId]);
+  if (report.length === 0) {
+    return res.status(404).json({ message: "Report not found" });
+  }
+
+  const ownerId = report[0].user_id;
+  const [owner] = await db.query("SELECT devices_token FROM users WHERE id = ?", [ownerId]);
+
+  if (owner.length > 0) {
+    const notificationMessage = `Your lost item has been found! Contact: ${full_name} (Phone: ${phone}).`;
+    await sendNotification(owner[0].devices_token, "Lost Item Found", notificationMessage);
+  }
+
+  res.status(200).json({ message: "Report status updated and owner notified successfully" });
+  // try {
+  // } catch (error) {
+  //   console.error("Error updating report:", error);
+  //   res.status(500).json({ message: "Error updating report" });
+  // }
+});
+
+module.exports = { updateReportStatus };
+
 module.exports = {
   createReport,
   getReports,
@@ -269,6 +339,7 @@ module.exports = {
   deleteReport,
   editreport,
   getMatchingReports,
+  updateReportStatus
 };
 
 

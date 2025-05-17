@@ -1,6 +1,6 @@
 exports.queryList = {
-  INSERT_NEW_USER_REGISTERED: `INSERT INTO users (full_name, email, university_id, phone, password, photo, role)
-  VALUES (?, ?, ?, ?, ?, ?, 'user')`,
+  INSERT_NEW_USER_REGISTERED: `INSERT INTO users (full_name, email, university_id, phone, password, photo, role,devices_token)
+  VALUES (?, ?, ?, ?, ?, ?,?, 'user')`,
   CHECK_EMAIL_UNIVERSITY_ID_PHONE_lSQL:'SELECT * FROM users WHERE email = ? OR university_id = ? OR phone = ?',
   LOGIN:`SELECT * FROM users WHERE email = ?`,
   CREATE_NEW_REPORT :`INSERT INTO reports (status, item_type, color, report_date, report_time, location, description, user_id, photo)
