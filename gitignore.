@@ -1,6 +1,6 @@
 # Node.js
 node_modules/
-
+test
 # Logs
 logs/
 *.log
