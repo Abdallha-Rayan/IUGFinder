@@ -8,4 +8,7 @@
       'This is a test message'
     );
   })();
+<<<<<<< Updated upstream
   
+=======
+>>>>>>> Stashed changes
